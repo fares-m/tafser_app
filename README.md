@@ -10,6 +10,8 @@
 1. Tafser folder :
 https://drive.google.com/file/d/1BuuQbxSo4wr2kyi5MfbIsQZY-zJFPthf/view?usp=sharing
 
+* Tafser folder put beside start.pyw
+
 ### Fast use 
 run start.pyw
 
