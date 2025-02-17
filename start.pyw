@@ -49,6 +49,8 @@ def get_tafser(sura , aya):
         except IndexError:pass
         except FileNotFoundError:pass
         except KeyError :pass
+        except Exception as e:
+            with open("Error_log.txt" , 'a') as log_file :log_file.write(f'[-] {e}\n\n')
         
         try:
             with open(Tafser_Path+rf'\{name}\sura{(sura+1 if aya+1>surah_ayat_count[sura] else sura)}\aya{1 if aya+1>surah_ayat_count[sura] else aya+1}.txt' , 'rb') as file :
@@ -57,6 +59,8 @@ def get_tafser(sura , aya):
         except FileNotFoundError:pass
         except IndexError:pass
         except KeyError:pass
+        except Exception as e:
+            with open("Error_log.txt" , 'a') as log_file :log_file.write(f'[-] {e}\n\n')
 
         try :
             with open(Tafser_Path+rf'\{name}\sura{sura}\aya{aya}.txt' , 'rb') as file :
@@ -93,8 +97,11 @@ def prepare_html_file(tafaser , prev_aya , curr_aya , next_aya , sura , aya):
 
 
 def get_favicon():
-    with open('favicon.ico' , 'rb') as file :
-        return file.read()
+    try:
+        with open('favicon.ico' , 'rb') as file :
+            return file.read()
+    except Exception as e:
+            with open("Error_log.txt" , 'a') as log_file :log_file.write(f'[-] {e}\n\n')
 
 def get_default():
     try:
@@ -102,6 +109,8 @@ def get_default():
             return file.read()
     except FileNotFoundError :
         return 'sura1-aya1'
+    except Exception as e:
+            with open("Error_log.txt" , 'a') as log_file :log_file.write(f'[-] {e}\n\n')
 
 def handle_request(request):
     path = request.split()[1]
@@ -137,6 +146,7 @@ def start_server(host , port):
         except Exception as e:
             with open("Error_log.txt" , 'a') as log_file :log_file.write(f'[-] {e}\n')
             exit()
+        
         with open('pid.txt' , 'w') as file :file.write(str(os.getpid()))
 
         webbrowser.open("http://"+host+f":{port}")
