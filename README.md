@@ -21,5 +21,5 @@ replace 'False' to 'True' in 'start.pyw' Line:158
 
 
 ### Hints in website:
-use left right arrow to navigate through verses
-use up down arrow to change the scholar Interpretation 
+* use left right arrow to navigate through verses
+* use up down arrow to change the scholar Interpretation 
