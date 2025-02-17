@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تفسير القرآن الكريم</title>
+    <link rel="stylesheet" href="styles.css">
+    <script>
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            const prevButton = document.getElementById("prev-button");
+            const nextButton = document.getElementById("next-button");
+
+            document.addEventListener("keydown", function (event) {
+                if (event.key === "ArrowLeft") {
+                    nextButton.click();  // محاكاة الضغط على زر "الآية التالية"
+                } else if (event.key === "ArrowRight") {
+                    prevButton.click();  // محاكاة الضغط على زر "الآية السابقة"
+                }
+            });
+            const tafseerSelect = document.getElementById("tafseer-select");
+            const tafseerText = document.getElementById("tafseer-text");
+            document.addEventListener("keydown", function (event) {
+                let currentIndex = tafseerSelect.selectedIndex;
+
+                if (event.key === "ArrowUp") {
+                    // الانتقال إلى التفسير السابق إذا لم يكن الأول
+                    if (currentIndex > 0) {
+                        tafseerSelect.selectedIndex = currentIndex - 1;
+                        tafseerSelect.dispatchEvent(new Event("change")); // تشغيل الحدث لتحديث التفسير
+                    }
+                    event.preventDefault(); // منع التمرير الافتراضي للصفحة
+                } 
+                else if (event.key === "ArrowDown") {
+                    // الانتقال إلى التفسير التالي إذا لم يكن الأخير
+                    if (currentIndex < tafseerSelect.options.length - 1) {
+                        tafseerSelect.selectedIndex = currentIndex + 1;
+                        tafseerSelect.dispatchEvent(new Event("change")); // تشغيل الحدث لتحديث التفسير
+                    }
+                    event.preventDefault(); // منع التمرير الافتراضي للصفحة
+                }
+            });
+
+            const tafseerData = {
+                "1": "TAFSER_IBN_KATHEER",
+                "2": "TAFSER_AL_TABARI",
+                "3": "TAFSER_AL_SAADI",
+                "4": "TAFSER_AL_BAGAWI",
+                "5": "TAFSER_AL_KURTUBI"
+            };
+
+            tafseerSelect.addEventListener("change", function () {
+                console.log("changed To : ", tafseerSelect.value);
+                tafseerText.innerHTML = `<p>${tafseerData[tafseerSelect.value]}</p>`;
+            });
+            const savedTafseer = localStorage.getItem("selected-tafseer");
+            if (savedTafseer) {
+                tafseerSelect.value = savedTafseer;
+                tafseerText.innerHTML = `<p>${tafseerData[savedTafseer]}</p>`;
+            }
+
+            // ✅ حفظ التفسير عند تغييره
+            tafseerSelect.addEventListener("change", function () {
+                let selectedTafseer = tafseerSelect.value;
+                localStorage.setItem("selected-tafseer", selectedTafseer);
+                tafseerText.innerHTML = `<p>${tafseerData[selectedTafseer]}</p>`;
+            });
+            const suraSelect = document.getElementById("sura-select");
+            const ayaSelect = document.getElementById("aya-select");
+            const goButton = document.getElementById("go-button");
+            let currentSura = parseInt(suraSelect.value); 
+            console.log(suraSelect.value)
+            let currentAya = parseInt(ayaSelect.value);
+
+            const suras = [
+            { name: "1-الفاتحة", ayaCount: 7 },{ name: "2-البقرة", ayaCount: 286 },{ name: "3-آل عمران", ayaCount: 200 },
+            { name: "4-النساء", ayaCount: 176 },{ name: "5-المائدة", ayaCount: 120 },{ name: "6-الأنعام", ayaCount: 165 }, 
+            { name: "7-الأعراف", ayaCount: 206 },{ name: "8-الأنفال", ayaCount: 75 },{ name: "9-التوبة", ayaCount: 129 },
+            { name: "10-يونس", ayaCount: 109 },{ name: "11-هود", ayaCount: 123 },{ name: "12-يوسف", ayaCount: 111 },
+            { name: "13-الرعد", ayaCount: 43 },{ name: "14-إبراهيم", ayaCount: 52 },{ name: "15-الحجر", ayaCount: 99 },
+            { name: "16-النحل", ayaCount: 128 },{ name: "17-الإسراء", ayaCount: 111 },{ name: "18-الكهف", ayaCount: 110 },
+            { name: "19-مريم", ayaCount: 98 },{ name: "20-طه", ayaCount: 135 },{ name: "21-الأنبياء", ayaCount: 112 },
+            { name: "22-الحج", ayaCount: 78 },{ name: "23-المؤمنون", ayaCount: 118 },{ name: "24-النور", ayaCount: 64 },
+            { name: "25-الفرقان", ayaCount: 77 },{ name: "26-الشعراء", ayaCount: 227 },{ name: "27-النمل", ayaCount: 93 },
+            { name: "28-القصص", ayaCount: 88 },{ name: "29-العنكبوت", ayaCount: 69 },{ name: "30-الروم", ayaCount: 60 },
+            { name: "31-لقمان", ayaCount: 34 },{ name: "32-السجدة", ayaCount: 30 },{ name: "33-الأحزاب", ayaCount: 73 },
+            { name: "34-سبأ", ayaCount: 54 },{ name: "35-فاطر", ayaCount: 45 },{ name: "36-يس", ayaCount: 83 },
+            { name: "37-الصافات", ayaCount: 182 },{ name: "38-ص", ayaCount: 88 },{ name: "39-الزمر", ayaCount: 75 },
+            { name: "40-غافر", ayaCount: 85 },{ name: "41-فصلت", ayaCount: 54 },{ name: "42-الشورى", ayaCount: 53 },
+            { name: "43-الزخرف", ayaCount: 89 },{ name: "44-الدخان", ayaCount: 59 },{ name: "45-الجاثية", ayaCount: 37 },
+            { name: "46-الأحقاف", ayaCount: 35 },{ name: "47-محمد", ayaCount: 38 },{ name: "48-الفتح", ayaCount: 29 },
+            { name: "49-الحجرات", ayaCount: 18 },{ name: "50-ق", ayaCount: 45 },{ name: "51-الذاريات", ayaCount: 60 },
+            { name: "52-الطور", ayaCount: 49 },{ name: "53-النجم", ayaCount: 62 },{ name: "54-القمر", ayaCount: 55 },
+            { name: "55-الرحمن", ayaCount: 78 },{ name: "56-الواقعة", ayaCount: 96 },{ name: "57-الحديد", ayaCount: 29 },
+            { name: "58-المجادلة", ayaCount: 22 },{ name: "59-الحشر", ayaCount: 24 },{ name: "60-الممتحنة", ayaCount: 13 },
+            { name: "61-الصف", ayaCount: 14 },{ name: "62-الجمعة", ayaCount: 11 },{ name: "63-المنافقون", ayaCount: 11 },
+            { name: "64-التغابن", ayaCount: 18 },{ name: "65-الطلاق", ayaCount: 12 },{ name: "66-التحريم", ayaCount: 12 },
+            { name: "67-الملك", ayaCount: 30 },{ name: "68-القلم", ayaCount: 52 },{ name: "69-الحاقة", ayaCount: 52 },
+            { name: "70-المعارج", ayaCount: 44 },{ name: "71-نوح", ayaCount: 28 },{ name: "72-الجن", ayaCount: 28 },
+            { name: "73-المزمل", ayaCount: 20 },{ name: "74-المدثر", ayaCount: 56 },{ name: "75-القيامة", ayaCount: 40 },
+            { name: "76-الإنسان", ayaCount: 31 },{ name: "77-المرسلات", ayaCount: 50 },{ name: "78-النبأ", ayaCount: 40 },
+            { name: "79-النازعات", ayaCount: 46 },{ name: "80-عبس", ayaCount: 42 },{ name: "81-التكوير", ayaCount: 29 },
+            { name: "82-الانفطار", ayaCount: 19 },{ name: "83-المطففين", ayaCount: 36 },{ name: "84-الانشقاق", ayaCount: 25 },
+            { name: "85-البروج", ayaCount: 22 },{ name: "86-الطارق", ayaCount: 17 },{ name: "87-الأعلى", ayaCount: 19 },
+            { name: "88-الغاشية", ayaCount: 26 },{ name: "89-الفجر", ayaCount: 30 },{ name: "90-البلد", ayaCount: 20 },
+            { name: "91-الشمس", ayaCount: 15 },{ name: "92-الليل", ayaCount: 21 },{ name: "93-الضحى", ayaCount: 11 },
+            { name: "94-الشرح", ayaCount: 8 },{ name: "95-التين", ayaCount: 8 },{ name: "96-العلق", ayaCount: 19 },
+            { name: "97-القدر", ayaCount: 5 },{ name: "98-البينة", ayaCount: 8 },{ name: "99-الزلزلة", ayaCount: 8 },
+            { name: "100-العاديات", ayaCount: 11 },{ name: "101-القارعة", ayaCount: 11 },{ name: "102-التكاثر", ayaCount: 8 },
+            { name: "103-العصر", ayaCount: 3 },{ name: "104-الهمزة", ayaCount: 9 },{ name: "105-الفيل", ayaCount: 5 },
+            { name: "106-قريش", ayaCount: 4 },{ name: "107-الماعون", ayaCount: 7 },{ name: "108-الكوثر", ayaCount: 3 },
+            { name: "109-الكافرون", ayaCount: 6 },{ name: "110-النصر", ayaCount: 3 },{ name: "111-المسد", ayaCount: 5 },
+            { name: "112-الإخلاص", ayaCount: 4 },{ name: "113-الفلق", ayaCount: 5 },{ name: "114-الناس", ayaCount: 6 },
+            ];
+
+            // ملء قائمة السور
+            suras.forEach(function(sura, index) {
+                const option = document.createElement("option");
+                option.value = index + 1;
+                option.textContent = `${sura.name}`;
+                suraSelect.appendChild(option);
+            });
+
+            // تحميل الآيات بناءً على السورة
+            suraSelect.addEventListener("change", function () {
+                const selectedSura = suras[suraSelect.value - 1];
+                ayaSelect.innerHTML = '';
+                for (let i = 1; i <= selectedSura.ayaCount; i++) {
+                    const option = document.createElement("option");
+                    option.value = i;
+                    option.textContent = `الآية ${i}`;
+                    ayaSelect.appendChild(option);
+                }
+            });
+
+            goButton.addEventListener("click", function () {
+                const suraNumber = suraSelect.value;
+                const ayaNumber = ayaSelect.value;
+                window.location.href = `http://SERVER_IP:SERVER_PORT/sura${suraNumber}-aya${ayaNumber}`;
+            });
+        });
+    </script>
+    <style>
+        /* الوضع العادي (الفاتح) */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        /* الوضع الداكن */
+        body.dark-mode {
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .dark-mode .navigate-container,
+        .dark-mode .ayah-container,
+        .dark-mode .tafseer-text,
+        .dark-mode .tafseer-container {
+            background-color: #2c2c2c;
+            color: #ffffff;
+            /* box-shadow: 0 4px 8px rgba(255, 255, 255, 0.1); */
+        }
+
+        .dark-mode #next-button, 
+        .dark-mode #prev-button {
+            background-color: #444;
+        }
+
+        .dark-mode select, 
+        .dark-mode button {
+            background-color: #555;
+            color: white;
+            border: 1px solid #777;
+        }
+
+        header {
+            background: #007BFF;
+            color: white;
+            padding: 10px;
+            font-size: 24px;
+            border-radius: 5px;
+        }
+        
+        .navigate-container {
+            width: 220px; /* حجم ثابت */
+            min-width: 220px; /* عدم تقليل الحجم */
+            height: auto; /* السماح له بالتمدد حسب المحتوى */
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: right;
+        }
+
+
+        .ayah-container, .tafseer-container {
+            background: white;
+            padding: 50px;
+            margin: 0px auto;
+            width: 80%;
+            max-width: 600px;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .tafseer-container {
+            position: relative; /* لضمان أن الروابط ستكون بالنسبة لهذه الحاوية */
+            background: white;
+            padding: 20px;
+            margin: 20px auto;
+            width: 82%;
+            max-width: 1100px;
+            border-radius: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        select, button {
+            padding: 10px;
+            font-size: 20px;
+            margin-top: 10px;
+        }
+        .tafseer-text {
+            margin-top: 15px;
+            font-size: 18px;
+            color: #1d1d1d;
+        }
+        #next-button, #prev-button {
+            position: fixed;
+            top: 80%; /* جعل الرابط في المنتصف عموديًا */
+            transform: translateY(-50%); /* لضبط المحاذاة بشكل دقيق */
+            font-size: 18px;
+            padding: 10px 10px;
+            background-color: #11c911;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+
+        #next-button {
+            left: 10px;
+            
+        }
+
+        #prev-button {
+            right: 5px;
+        }
+        table {
+            padding-left: 100px;
+        }
+        gg {
+            display: flex; /* جعل العناصر تصطف أفقياً */
+            justify-content: center; /* توسيط العناصر أفقيًا */
+            align-items: flex-start; /* محاذاة العناصر من الأعلى */
+            gap: 2px; /* مسافة بين العناصر */
+        }
+
+
+
+        .ayah-container {
+            width: 130%; /* جعل الحاوية تأخذ 60% من العرض */
+            max-width: 1000px;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+                
+        }
+        #toggle-dark-mode{
+            border-radius: 20px;
+        }
+    </style>
+</head>
+<body>
+    
+    <main>
+
+        <table align="center">
+            <tr>
+                <td><strong>الآيه : AYA_NUMBER |</strong></td>
+                <td><strong>سورة : SURA_NUMBER</strong></td>
+            </tr>
+        </table>
+        <gg>
+            
+    <div class="navigate-container">
+        <label for="sura-select">اختر السورة:</label>
+        <select id="sura-select">
+            <option value="" disabled selected>اختر السورة</option>
+        </select>
+        <br>
+        <label for="aya-select">اختر الآية:</label>
+        <select id="aya-select">
+            <option value="" disabled selected>اختر الآية</option>
+        </select>
+        <br>
+        <button id="go-button">انتقل</button>
+    </div>
+    <div class="ayah-container">
+        <!-- <h2>الآية:</h2> -->
+        <p id="ayah" style="font-size: 17px;">PREV_AYA</p>
+        <hr>
+        <h3 id="ayah"><strong style="font-size: 23px;">CURRENT_AYA</strong></h3>
+        <hr>
+        <p id="ayah" style="font-size: 17px;">NEXT_AYA</p>
+    </div>
+    <button id="toggle-dark-mode">🌙 الوضع الداكن</button>
+</gg>
+
+        <div class="tafseer-container">
+            <label for="tafseer-select">اختر التفسير:</label>
+            <select id="tafseer-select">
+                <option value="3">تفسير السعدي</option>
+                <option value="1">تفسير ابن كثير</option>
+                <option value="2">تفسير الطبري</option>
+                <option value="4">تفسير البغوي</option>
+                <option value="5">تفسير القرطبي</option>
+            </select>
+            
+            <div class="tafseer-text" id="tafseer-text">
+                <p>TAFSER_AL_SAADI</p>
+            </div>
+        </div>
+        <div>
+            <a id="prev-button" href="PREV_LINK_AYA">الآية السابقة &rarr;</a>
+            <a id="next-button" href="NEXT_LINK_AYA">&larr; الآية التالية</a>
+        </div>
+        
+        
+    </main>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const toggleButton = document.getElementById("toggle-dark-mode");
+            const body = document.body;
+    
+            // التحقق مما إذا كان المستخدم قد استخدم الوضع الداكن مسبقًا
+            if (localStorage.getItem("dark-mode") === "enabled") {
+                body.classList.add("dark-mode");
+                toggleButton.textContent = "☀️ الوضع الفاتح";
+            }
+    
+            // عند النقر على الزر، يتم التبديل بين الوضعين
+            toggleButton.addEventListener("click", function () {
+                body.classList.toggle("dark-mode");
+    
+                if (body.classList.contains("dark-mode")) {
+                    localStorage.setItem("dark-mode", "enabled");
+                    toggleButton.textContent = "☀️ الوضع الفاتح";
+                } else {
+                    localStorage.setItem("dark-mode", "disabled");
+                    toggleButton.textContent = "🌙 الوضع الداكن";
+                }
+            });
+        });
+    </script>
+
+</body>
+</html>
